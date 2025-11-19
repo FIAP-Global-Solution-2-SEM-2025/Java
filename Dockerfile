@@ -2,11 +2,13 @@
 
 WORKDIR /workspace/app
 
-# Copy from bpm-connect subdirectory
+# Copy Maven wrapper from root
+COPY mvnw .
+COPY .mvn .mvn
+
+# Copy application files from bpm-connect
 COPY bpm-connect/pom.xml .
 COPY bpm-connect/src ./src
-COPY bpm-connect/.mvn ./.mvn
-COPY bpm-connect/mvnw .
 
 # Make mvnw executable and build
 RUN chmod +x mvnw && ./mvnw clean package -DskipTests
