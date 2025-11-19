@@ -1,11 +1,14 @@
-﻿FROM eclipse-temurin:21-jdk-alpine
+﻿FROM eclipse-temurin:21-jdk-alpine as builder
 
 WORKDIR /workspace/app
 
-# Copy everything from bpm-connect
-COPY bpm-connect .
+# Copy from bpm-connect subdirectory
+COPY bpm-connect/pom.xml .
+COPY bpm-connect/src ./src
+COPY bpm-connect/.mvn ./.mvn
+COPY bpm-connect/mvnw .
 
-# Build the application
+# Make mvnw executable and build
 RUN chmod +x mvnw && ./mvnw clean package -DskipTests
 
 FROM eclipse-temurin:21-jre-alpine
