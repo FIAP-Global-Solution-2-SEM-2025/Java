@@ -1,15 +1,15 @@
-﻿FROM eclipse-temurin:21-jdk-alpine as build
+﻿FROM eclipse-temurin:21-jdk-alpine
 
 WORKDIR /workspace/app
 
-# Copy everything from bpm-connect
-COPY bpm-connect/. .
+# Install Maven manually since mvnw isn't working
+RUN apk add --no-cache maven
 
-# Make mvnw executable
-RUN chmod +x mvnw
+# Copy the entire project
+COPY . .
 
 # Build the application
-RUN ./mvnw clean package -DskipTests
+RUN mvn clean package -DskipTests
 
 FROM eclipse-temurin:21-jre-alpine
 
