@@ -10,7 +10,7 @@ RUN pwd
 RUN ls -la
 RUN find .. -name "pom.xml" -o -name "mvnw" -o -name ".mvn" | head -10
 
-# Copy from bpm-connect subdirectory - CORRIGIDO!
+# Copy from bpm-connect subdirectory
 COPY bpm-connect/pom.xml .
 COPY bpm-connect/src ./src
 COPY bpm-connect/.mvn ./.mvn
