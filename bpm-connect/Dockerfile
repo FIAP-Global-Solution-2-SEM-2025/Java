@@ -1,8 +1,8 @@
-﻿FROM eclipse-temurin:21-jdk-alpine
+﻿FROM eclipse-temurin:21-jdk-alpine as builder
 
 WORKDIR /workspace/app
 
-# Install Maven manually since mvnw isn't working
+# Install Maven
 RUN apk add --no-cache maven
 
 # Copy the entire project
@@ -15,8 +15,8 @@ FROM eclipse-temurin:21-jre-alpine
 
 WORKDIR /app
 
-# Copy the built application
-COPY --from=build /workspace/app/target/quarkus-app /app
+# Copy the built application from the builder stage
+COPY --from=builder /workspace/app/target/quarkus-app /app
 
 EXPOSE 8080
 
