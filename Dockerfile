@@ -9,11 +9,11 @@ RUN apk add --no-cache maven
 RUN pwd
 RUN ls -la
 
-# Copy specific files first
-COPY pom.xml .
-COPY src ./src
-COPY .mvn ./.mvn
-COPY mvnw .
+# Copy from bpm-connect subdirectory
+COPY bpm-connect/pom.xml .
+COPY bpm-connect/src ./src
+COPY bpm-connect/.mvn ./.mvn
+COPY bpm-connect/mvnw .
 
 # Debug: Show files after copy
 RUN ls -la
