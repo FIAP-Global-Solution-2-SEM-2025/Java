@@ -5,11 +5,25 @@ WORKDIR /workspace/app
 # Install Maven
 RUN apk add --no-cache maven
 
-# Copy the entire project
-COPY . .
+# Debug: Show current directory
+RUN pwd
+RUN ls -la
+
+# Copy specific files first
+COPY pom.xml .
+COPY src ./src
+COPY .mvn ./.mvn
+COPY mvnw .
+
+# Debug: Show files after copy
+RUN ls -la
+RUN ls -la src/
+
+# Make mvnw executable
+RUN chmod +x mvnw
 
 # Build the application
-RUN mvn clean package -DskipTests
+RUN ./mvnw clean package -DskipTests
 
 FROM eclipse-temurin:21-jre-alpine
 
