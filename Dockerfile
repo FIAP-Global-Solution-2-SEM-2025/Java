@@ -2,17 +2,15 @@
 
 WORKDIR /workspace/app
 
-# Copy Maven wrapper from ROOT
-COPY mvnw .
-# Copy .mvn folder from bpm-connect
-COPY bpm-connect/.mvn .mvn
+# Install system Maven
+RUN apk add --no-cache maven
 
 # Copy application files from bpm-connect
 COPY bpm-connect/pom.xml .
 COPY bpm-connect/src ./src
 
-# Make mvnw executable and build
-RUN chmod +x mvnw && ./mvnw clean package -DskipTests
+# Build using system maven (no mvnw needed)
+RUN mvn clean package -DskipTests
 
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
