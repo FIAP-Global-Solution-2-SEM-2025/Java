@@ -2,9 +2,10 @@
 
 WORKDIR /workspace/app
 
-# Copy Maven wrapper from root
+# Copy Maven wrapper from ROOT
 COPY mvnw .
-COPY .mvn .mvn
+# Copy .mvn folder from bpm-connect
+COPY bpm-connect/.mvn .mvn
 
 # Copy application files from bpm-connect
 COPY bpm-connect/pom.xml .
