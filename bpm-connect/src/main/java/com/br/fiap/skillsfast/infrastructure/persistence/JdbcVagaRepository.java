@@ -4,7 +4,6 @@ import com.br.fiap.skillsfast.domain.model.Vaga;
 import com.br.fiap.skillsfast.domain.repository.VagaRepository;
 import com.br.fiap.skillsfast.infrastructure.exceptions.InfraestruturaException;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.enterprise.inject.Alternative;
 import jakarta.inject.Inject;
 import javax.sql.DataSource;
 import java.sql.*;
@@ -21,6 +20,9 @@ public class JdbcVagaRepository implements VagaRepository {
 
     @Override
     public Vaga salvar(Vaga vaga) {
+        System.out.println("=== [DEBUG] INICIANDO salvar() VAGA ===");
+        System.out.println("[DEBUG] Dados da vaga: " + vaga.getTitulo() + ", Empresa: " + vaga.getEmpresaNome());
+
         String sql = """
             INSERT INTO VAGA (ID, TITULO, DESCRICAO, TIPO, NIVEL, LOCALIZACAO, SALARIO, REQUISITOS, EMPRESA_ID, EMPRESA_NOME)
             VALUES (VAGA_SEQ.NEXTVAL, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -28,6 +30,8 @@ public class JdbcVagaRepository implements VagaRepository {
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql, new String[]{"ID"})) {
+
+            System.out.println("[DEBUG] Preparando statement...");
 
             stmt.setString(1, vaga.getTitulo());
             stmt.setString(2, vaga.getDescricao());
@@ -37,29 +41,49 @@ public class JdbcVagaRepository implements VagaRepository {
 
             if (vaga.getSalario() != null) {
                 stmt.setBigDecimal(6, vaga.getSalario());
+                System.out.println("[DEBUG] Salario: " + vaga.getSalario());
             } else {
                 stmt.setNull(6, java.sql.Types.DECIMAL);
+                System.out.println("[DEBUG] Salario: NULL");
             }
 
             if (vaga.getRequisitos() != null && !vaga.getRequisitos().isEmpty()) {
-                stmt.setString(7, String.join(",", vaga.getRequisitos()));
+                String requisitosStr = String.join(",", vaga.getRequisitos());
+                stmt.setString(7, requisitosStr);
+                System.out.println("[DEBUG] Requisitos: " + requisitosStr);
             } else {
                 stmt.setString(7, "");
+                System.out.println("[DEBUG] Requisitos: VAZIO");
             }
 
             stmt.setLong(8, vaga.getEmpresaId());
             stmt.setString(9, vaga.getEmpresaNome());
 
-            stmt.executeUpdate();
+            System.out.println("[DEBUG] EmpresaId: " + vaga.getEmpresaId());
+            System.out.println("[DEBUG] EmpresaNome: " + vaga.getEmpresaNome());
+
+            System.out.println("[DEBUG] Executando INSERT...");
+            int linhasAfetadas = stmt.executeUpdate();
+            System.out.println("[DEBUG] Linhas afetadas: " + linhasAfetadas);
 
             try (ResultSet rs = stmt.getGeneratedKeys()) {
                 if (rs.next()) {
-                    vaga.setId(rs.getLong(1));
+                    Long idGerado = rs.getLong(1);
+                    vaga.setId(idGerado);
+                    System.out.println("[DEBUG] ID gerado: " + idGerado);
+                } else {
+                    System.out.println("[DEBUG] Nenhum ID gerado!");
                 }
             }
 
+            System.out.println("=== [DEBUG] Vaga salva com sucesso ===");
             return vaga;
+
         } catch (SQLException e) {
+            System.err.println("[DEBUG] SQLException no salvar: " + e.getMessage());
+            System.err.println("[DEBUG] SQL State: " + e.getSQLState());
+            System.err.println("[DEBUG] Error Code: " + e.getErrorCode());
+            e.printStackTrace();
             throw new InfraestruturaException("Erro ao salvar vaga", e);
         }
     }
