@@ -11,6 +11,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.math.BigDecimal;
 
 @ApplicationScoped
 public class JdbcVagaRepository implements VagaRepository {
@@ -84,6 +85,7 @@ public class JdbcVagaRepository implements VagaRepository {
 
     @Override
     public List<Vaga> buscarTodas() {
+        System.out.println("=== [DEBUG] INICIANDO buscarTodas() ===");
         String sql = "SELECT * FROM VAGA ORDER BY DATA_PUBLICACAO DESC";
         List<Vaga> vagas = new ArrayList<>();
 
@@ -91,11 +93,44 @@ public class JdbcVagaRepository implements VagaRepository {
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
 
+            System.out.println("[DEBUG] Conexão e query executada com sucesso");
+
+            int count = 0;
             while (rs.next()) {
-                vagas.add(mapearVaga(rs));
+                count++;
+                Long id = rs.getLong("ID");
+                System.out.println("[DEBUG] Processando vaga " + count + ", ID: " + id);
+
+                // Debug de cada campo
+                System.out.println("   TITULO: " + rs.getString("TITULO"));
+                System.out.println("   DESCRICAO: " + (rs.getString("DESCRICAO") != null ? "PRESENTE" : "NULL"));
+                System.out.println("   TIPO: " + rs.getString("TIPO"));
+                System.out.println("   NIVEL: " + rs.getString("NIVEL"));
+                System.out.println("   LOCALIZACAO: " + rs.getString("LOCALIZACAO"));
+                System.out.println("   EMPRESA_ID: " + rs.getLong("EMPRESA_ID"));
+                System.out.println("   EMPRESA_NOME: " + rs.getString("EMPRESA_NOME"));
+
+                try {
+                    Vaga vaga = mapearVaga(rs);
+                    vagas.add(vaga);
+                    System.out.println("   Vaga mapeada com sucesso");
+                } catch (Exception e) {
+                    System.err.println("   ERRO no mapeamento da vaga ID " + id);
+                    e.printStackTrace();
+                    throw e;
+                }
             }
+
+            System.out.println("=== [DEBUG] buscarTodas() finalizado. Total: " + count + " vagas ===");
             return vagas;
+
         } catch (SQLException e) {
+            System.err.println("[DEBUG] SQLException no buscarTodas: " + e.getMessage());
+            e.printStackTrace();
+            throw new InfraestruturaException("Erro ao buscar todas as vagas", e);
+        } catch (Exception e) {
+            System.err.println("[DEBUG] Exception genérica no buscarTodas: " + e.getMessage());
+            e.printStackTrace();
             throw new InfraestruturaException("Erro ao buscar todas as vagas", e);
         }
     }
@@ -222,34 +257,73 @@ public class JdbcVagaRepository implements VagaRepository {
     }
 
     private Vaga mapearVaga(ResultSet rs) throws SQLException {
+        System.out.println("   [DEBUG] Iniciando mapearVaga");
+
         Vaga vaga = new Vaga();
-        vaga.setId(rs.getLong("ID"));
-        vaga.setTitulo(rs.getString("TITULO"));
-        vaga.setDescricao(rs.getString("DESCRICAO"));
-        vaga.setTipo(rs.getString("TIPO"));
-        vaga.setNivel(rs.getString("NIVEL"));
-        vaga.setLocalizacao(rs.getString("LOCALIZACAO"));
-        vaga.setSalario(rs.getBigDecimal("SALARIO"));
 
-        // Converter string de requisitos para lista
-        String requisitosStr = rs.getString("REQUISITOS");
-        if (requisitosStr != null && !requisitosStr.trim().isEmpty()) {
-            vaga.setRequisitos(List.of(requisitosStr.split(",")));
-        } else {
-            vaga.setRequisitos(new ArrayList<>());
+        try {
+            vaga.setId(rs.getLong("ID"));
+            System.out.println("     ID: " + vaga.getId());
+
+            vaga.setTitulo(rs.getString("TITULO"));
+            System.out.println("     TITULO: " + vaga.getTitulo());
+
+            vaga.setDescricao(rs.getString("DESCRICAO"));
+            System.out.println("     DESCRICAO: " + (vaga.getDescricao() != null ? "PRESENTE" : "NULL"));
+
+            vaga.setTipo(rs.getString("TIPO"));
+            System.out.println("     TIPO: " + vaga.getTipo());
+
+            vaga.setNivel(rs.getString("NIVEL"));
+            System.out.println("     NIVEL: " + vaga.getNivel());
+
+            vaga.setLocalizacao(rs.getString("LOCALIZACAO"));
+            System.out.println("     LOCALIZACAO: " + vaga.getLocalizacao());
+
+            BigDecimal salario = rs.getBigDecimal("SALARIO");
+            if (!rs.wasNull()) {
+                vaga.setSalario(salario);
+                System.out.println("     SALARIO: " + vaga.getSalario());
+            } else {
+                System.out.println("     SALARIO: NULL");
+            }
+
+            // Requisitos
+            String requisitosStr = rs.getString("REQUISITOS");
+            if (requisitosStr != null && !requisitosStr.trim().isEmpty()) {
+                vaga.setRequisitos(List.of(requisitosStr.split(",")));
+                System.out.println("     REQUISITOS: " + vaga.getRequisitos());
+            } else {
+                vaga.setRequisitos(new ArrayList<>());
+                System.out.println("     REQUISITOS: VAZIO");
+            }
+
+            vaga.setEmpresaId(rs.getLong("EMPRESA_ID"));
+            System.out.println("     EMPRESA_ID: " + vaga.getEmpresaId());
+
+            vaga.setEmpresaNome(rs.getString("EMPRESA_NOME"));
+            System.out.println("     EMPRESA_NOME: " + vaga.getEmpresaNome());
+
+            vaga.setAtiva(rs.getInt("ATIVA") == 1);
+            System.out.println("     ATIVA: " + vaga.isAtiva());
+
+            Timestamp dataPublicacao = rs.getTimestamp("DATA_PUBLICACAO");
+            if (dataPublicacao != null) {
+                vaga.setDataPublicacao(dataPublicacao.toLocalDateTime());
+                System.out.println("     DATA_PUBLICACAO: " + vaga.getDataPublicacao());
+            } else {
+                System.out.println("     DATA_PUBLICACAO: NULL");
+            }
+
+            vaga.setVersao(rs.getLong("VERSAO"));
+            System.out.println("     VERSAO: " + vaga.getVersao());
+
+            System.out.println("   [DEBUG] mapearVaga finalizado com sucesso");
+            return vaga;
+
+        } catch (Exception e) {
+            System.err.println("   ERRO no mapearVaga: " + e.getMessage());
+            throw e;
         }
-
-        vaga.setEmpresaId(rs.getLong("EMPRESA_ID"));
-        vaga.setEmpresaNome(rs.getString("EMPRESA_NOME"));
-        vaga.setAtiva(rs.getInt("ATIVA") == 1);
-
-        Timestamp dataPublicacao = rs.getTimestamp("DATA_PUBLICACAO");
-        if (dataPublicacao != null) {
-            vaga.setDataPublicacao(dataPublicacao.toLocalDateTime());
-        }
-
-        vaga.setVersao(rs.getLong("VERSAO"));
-
-        return vaga;
     }
 }
