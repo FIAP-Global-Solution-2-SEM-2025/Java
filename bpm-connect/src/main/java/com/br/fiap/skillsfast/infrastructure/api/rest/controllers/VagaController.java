@@ -186,17 +186,16 @@ public class VagaController {
 
     @POST
     public Response criarVaga(VagaInputDto vagaInput) {
-        System.out.println("🎯🎯🎯 [DEBUG CONTROLLER] INICIANDO criarVaga() 🎯🎯🎯");
+        System.out.println("[DEBUG CONTROLLER] INICIANDO criarVaga()");
 
         try {
-            System.out.println("=== DADOS RECEBIDOS DO FRONTEND ===");
             System.out.println("Titulo: " + vagaInput.getTitulo());
             System.out.println("Descricao: " + vagaInput.getDescricao());
             System.out.println("Tipo: " + vagaInput.getTipo());
             System.out.println("Nivel: " + vagaInput.getNivel());
             System.out.println("Localizacao: " + vagaInput.getLocalizacao());
             System.out.println("EmpresaId: " + vagaInput.getEmpresaId());
-            System.out.println("EmpresaNome: " + vagaInput.getEmpresaNome()); // ← VERIFIQUE SE NÃO É NULL!
+            System.out.println("EmpresaNome: " + vagaInput.getEmpresa());
             System.out.println("Salario: " + vagaInput.getSalario());
             System.out.println("Requisitos: " + vagaInput.getRequisitos());
 
@@ -212,19 +211,19 @@ public class VagaController {
             return Response.status(Response.Status.CREATED).entity(output).build();
 
         } catch (ValidacaoDominioException e) {
-            System.err.println("❌❌❌ ERRO DE VALIDAÇÃO: " + e.getMessage());
+            System.err.println("ERRO DE VALIDAÇÃO: " + e.getMessage());
             e.printStackTrace();
             return Response.status(Response.Status.BAD_REQUEST).entity("Erro validação: " + e.getMessage()).build();
 
         } catch (EntidadeNaoLocalizada e) {
-            System.err.println("❌❌❌ EMPRESA NÃO ENCONTRADA: " + e.getMessage());
+            System.err.println(" EMPRESA NÃO ENCONTRADA: " + e.getMessage());
             e.printStackTrace();
             return Response.status(Response.Status.BAD_REQUEST).entity("Empresa não encontrada: " + e.getMessage()).build();
 
         } catch (Exception e) {
-            System.err.println("❌❌❌ ERRO INTERNO INESPERADO: " + e.getMessage());
-            System.err.println("❌❌❌ TIPO DO ERRO: " + e.getClass().getName());
-            e.printStackTrace(); // ← ISSO É CRÍTICO!
+            System.err.println("ERRO INTERNO INESPERADO: " + e.getMessage());
+            System.err.println("TIPO DO ERRO: " + e.getClass().getName());
+            e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                     .entity("Erro interno: " + e.getClass().getSimpleName() + " - " + e.getMessage())
                     .build();

@@ -12,19 +12,10 @@ public class VagaInputDto {
     private BigDecimal salario;
     private List<String> requisitos;
     private Long empresaId;
-    private String empresaNome;
+    private String empresa;
 
     // Construtores
     public VagaInputDto() {}
-
-    public VagaInputDto(String titulo, String descricao, String tipo, String nivel, String localizacao, Long empresaId) {
-        this.titulo = titulo;
-        this.descricao = descricao;
-        this.tipo = tipo;
-        this.nivel = nivel;
-        this.localizacao = localizacao;
-        this.empresaId = empresaId;
-    }
 
     // Getters e Setters
     public String getTitulo() { return titulo; }
@@ -51,6 +42,6 @@ public class VagaInputDto {
     public Long getEmpresaId() { return empresaId; }
     public void setEmpresaId(Long empresaId) { this.empresaId = empresaId; }
 
-    public String getEmpresaNome() { return empresaNome; }
-    public void setEmpresaNome(String empresaNome) { this.empresaNome = empresaNome; }
+    public String getEmpresa() { return empresa; }
+    public void setEmpresa(String empresa) { this.empresa = empresa; }
 }

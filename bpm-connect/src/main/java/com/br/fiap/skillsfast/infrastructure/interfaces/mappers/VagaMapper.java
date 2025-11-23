@@ -16,7 +16,7 @@ public class VagaMapper {
         vaga.setSalario(dto.getSalario());
         vaga.setRequisitos(dto.getRequisitos());
         vaga.setEmpresaId(dto.getEmpresaId());
-        vaga.setEmpresaNome(dto.getEmpresaNome());
+        vaga.setEmpresaNome(dto.getEmpresa());
         return vaga;
     }
 
@@ -24,7 +24,7 @@ public class VagaMapper {
         VagaOutputDto dto = new VagaOutputDto();
         dto.setId(vaga.getId());
         dto.setTitulo(vaga.getTitulo());
-        dto.setEmpresa(vaga.getEmpresaNome() != null ? vaga.getEmpresaNome() : ""); // ← CORREÇÃO
+        dto.setEmpresa(vaga.getEmpresaNome() != null ? vaga.getEmpresaNome() : "");
         dto.setLocalizacao(vaga.getLocalizacao());
         dto.setTipo(vaga.getTipo());
         dto.setNivel(vaga.getNivel());
