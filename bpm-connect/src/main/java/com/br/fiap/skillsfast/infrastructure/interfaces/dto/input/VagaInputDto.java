@@ -12,6 +12,7 @@ public class VagaInputDto {
     private BigDecimal salario;
     private List<String> requisitos;
     private Long empresaId;
+    private String empresaNome;
 
     // Construtores
     public VagaInputDto() {}
@@ -49,4 +50,7 @@ public class VagaInputDto {
 
     public Long getEmpresaId() { return empresaId; }
     public void setEmpresaId(Long empresaId) { this.empresaId = empresaId; }
+
+    public String getEmpresaNome() { return empresaNome; }
+    public void setEmpresaNome(String empresaNome) { this.empresaNome = empresaNome; }
 }

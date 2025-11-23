@@ -39,6 +39,7 @@ public class JdbcVagaRepository implements VagaRepository {
             stmt.setString(4, vaga.getNivel());
             stmt.setString(5, vaga.getLocalizacao());
 
+            // CORREÇÃO: usar setBigDecimal() para compatibilidade com a entidade Vaga
             if (vaga.getSalario() != null) {
                 stmt.setBigDecimal(6, vaga.getSalario());
                 System.out.println("[DEBUG] Salario: " + vaga.getSalario());
@@ -214,6 +215,7 @@ public class JdbcVagaRepository implements VagaRepository {
             stmt.setString(4, vaga.getNivel());
             stmt.setString(5, vaga.getLocalizacao());
 
+            // CORREÇÃO: usar setBigDecimal() para compatibilidade com a entidade Vaga
             if (vaga.getSalario() != null) {
                 stmt.setBigDecimal(6, vaga.getSalario());
             } else {
@@ -304,11 +306,13 @@ public class JdbcVagaRepository implements VagaRepository {
             vaga.setLocalizacao(rs.getString("LOCALIZACAO"));
             System.out.println("     LOCALIZACAO: " + vaga.getLocalizacao());
 
+            // CORREÇÃO: usar getBigDecimal() para compatibilidade com a entidade Vaga
             BigDecimal salario = rs.getBigDecimal("SALARIO");
             if (!rs.wasNull()) {
                 vaga.setSalario(salario);
                 System.out.println("     SALARIO: " + vaga.getSalario());
             } else {
+                vaga.setSalario(null);
                 System.out.println("     SALARIO: NULL");
             }
 
