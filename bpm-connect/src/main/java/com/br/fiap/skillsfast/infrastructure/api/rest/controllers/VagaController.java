@@ -25,19 +25,19 @@ public class VagaController {
     @Inject
     VagaService vagaService;
 
-    @POST
-    public Response criarVaga(VagaInputDto vagaInput) {
-        try {
-            Vaga vaga = VagaMapper.toDomain(vagaInput);
-            Vaga vagaCriada = vagaService.criarVaga(vaga);
-            VagaOutputDto output = VagaMapper.toOutputDto(vagaCriada);
-            return Response.status(Response.Status.CREATED).entity(output).build();
-        } catch (ValidacaoDominioException | EntidadeNaoLocalizada e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
-        } catch (Exception e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Erro interno do servidor").build();
-        }
-    }
+    //@POST
+    //public Response criarVaga(VagaInputDto vagaInput) {
+    //    try {
+    //        Vaga vaga = VagaMapper.toDomain(vagaInput);
+    //        Vaga vagaCriada = vagaService.criarVaga(vaga);
+    //        VagaOutputDto output = VagaMapper.toOutputDto(vagaCriada);
+    //        return Response.status(Response.Status.CREATED).entity(output).build();
+    //    } catch (ValidacaoDominioException | EntidadeNaoLocalizada e) {
+    //        return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+    //    } catch (Exception e) {
+    //        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Erro interno do servidor").build();
+    //    }
+    //}
 
     @GET
     @Path("/{id}")
@@ -183,4 +183,34 @@ public class VagaController {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Erro interno do servidor").build();
         }
     }
+
+    @POST
+    public Response criarVaga(VagaInputDto vagaInput) {
+        try {
+            System.out.println("=== [CONTROLLER] RECEBENDO VAGA ===");
+            System.out.println("[CONTROLLER] Titulo: " + vagaInput.getTitulo());
+            System.out.println("[CONTROLLER] EmpresaId: " + vagaInput.getEmpresaId());
+            System.out.println("[CONTROLLER] EmpresaNome: " + vagaInput.getEmpresaNome());
+            System.out.println("[CONTROLLER] Descricao: " + vagaInput.getDescricao());
+
+            Vaga vaga = VagaMapper.toDomain(vagaInput);
+            System.out.println("[CONTROLLER] Vaga mapeada: " + vaga.getTitulo());
+
+            Vaga vagaCriada = vagaService.criarVaga(vaga);
+            VagaOutputDto output = VagaMapper.toOutputDto(vagaCriada);
+            return Response.status(Response.Status.CREATED).entity(output).build();
+
+        } catch (ValidacaoDominioException | EntidadeNaoLocalizada e) {
+            System.err.println("[CONTROLLER] ERRO DE VALIDAÇÃO: " + e.getMessage());
+            e.printStackTrace();
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+        } catch (Exception e) {
+            System.err.println("[CONTROLLER] ERRO INTERNO: " + e.getMessage());
+            e.printStackTrace(); // ← ISSO VAI MOSTRAR A STACK TRACE REAL
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Erro interno do servidor: " + e.getMessage())
+                    .build();
+        }
+    }
+
 }
