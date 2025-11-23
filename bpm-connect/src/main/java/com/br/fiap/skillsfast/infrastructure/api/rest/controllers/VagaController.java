@@ -25,19 +25,18 @@ public class VagaController {
     @Inject
     VagaService vagaService;
 
-    //@POST
-    //public Response criarVaga(VagaInputDto vagaInput) {
-    //    try {
-    //        Vaga vaga = VagaMapper.toDomain(vagaInput);
-    //        Vaga vagaCriada = vagaService.criarVaga(vaga);
-    //        VagaOutputDto output = VagaMapper.toOutputDto(vagaCriada);
-    //        return Response.status(Response.Status.CREATED).entity(output).build();
-    //    } catch (ValidacaoDominioException | EntidadeNaoLocalizada e) {
-    //        return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
-    //    } catch (Exception e) {
-    //        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Erro interno do servidor").build();
-    //    }
-    //}
+    @GET
+    public Response listarTodasVagas() {
+        try {
+            List<Vaga> vagas = vagaService.buscarTodasVagas();
+            List<VagaOutputDto> output = vagas.stream()
+                    .map(VagaMapper::toOutputDto)
+                    .collect(Collectors.toList());
+            return Response.ok(output).build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Erro interno do servidor").build();
+        }
+    }
 
     @GET
     @Path("/{id}")
@@ -114,6 +113,67 @@ public class VagaController {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Erro interno do servidor").build();
         }
     }
+
+    // ==============================================
+    // NOVOS ENDPOINTS DE BUSCA PARA FRONTEND
+    // ==============================================
+
+    @GET
+    @Path("/buscar/empresa")
+    public Response buscarVagasPorNomeEmpresa(@QueryParam("nome") String nomeEmpresa) {
+        try {
+            List<Vaga> vagas = vagaService.buscarVagasPorNomeEmpresa(nomeEmpresa);
+            List<VagaOutputDto> output = vagas.stream()
+                    .map(VagaMapper::toOutputDto)
+                    .collect(Collectors.toList());
+            return Response.ok(output).build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Erro ao buscar vagas por empresa: " + e.getMessage())
+                    .build();
+        }
+    }
+
+    @GET
+    @Path("/buscar/titulo-nivel")
+    public Response buscarVagasPorTituloENivel(
+            @QueryParam("titulo") String titulo,
+            @QueryParam("nivel") String nivel) {
+        try {
+            List<Vaga> vagas = vagaService.buscarVagasPorTituloENivel(titulo, nivel);
+            List<VagaOutputDto> output = vagas.stream()
+                    .map(VagaMapper::toOutputDto)
+                    .collect(Collectors.toList());
+            return Response.ok(output).build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Erro ao buscar vagas: " + e.getMessage())
+                    .build();
+        }
+    }
+
+    @GET
+    @Path("/buscar/avancado")
+    public Response buscarVagasAvancado(
+            @QueryParam("empresa") String empresa,
+            @QueryParam("titulo") String titulo,
+            @QueryParam("nivel") String nivel) {
+        try {
+            List<Vaga> vagas = vagaService.buscarVagasAvancado(empresa, titulo, nivel);
+            List<VagaOutputDto> output = vagas.stream()
+                    .map(VagaMapper::toOutputDto)
+                    .collect(Collectors.toList());
+            return Response.ok(output).build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Erro na busca avançada: " + e.getMessage())
+                    .build();
+        }
+    }
+
+    // ==============================================
+    // FIM DOS NOVOS ENDPOINTS
+    // ==============================================
 
     @PUT
     @Path("/{id}")
@@ -229,5 +289,4 @@ public class VagaController {
                     .build();
         }
     }
-
 }

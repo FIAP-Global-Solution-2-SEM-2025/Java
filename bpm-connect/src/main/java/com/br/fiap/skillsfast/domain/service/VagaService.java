@@ -19,4 +19,10 @@ public interface VagaService {
     void adicionarRequisitoAVaga(Long vagaId, String requisito) throws EntidadeNaoLocalizada, ValidacaoDominioException;
     List<Vaga> buscarVagasRecentes();
     Integer contarCandidaturasPorVaga(Long vagaId);
+    List<Vaga> buscarTodasVagas();
+
+    //Metodos criados para podermos efetuar buscas no nosso Front
+    List<Vaga> buscarVagasPorNomeEmpresa(String nomeEmpresa);
+    List<Vaga> buscarVagasPorTituloENivel(String titulo, String nivel);
+    List<Vaga> buscarVagasAvancado(String empresa, String titulo, String nivel);
 }

@@ -4,7 +4,6 @@ import com.br.fiap.skillsfast.domain.model.Usuario;
 import com.br.fiap.skillsfast.domain.repository.UsuarioRepository;
 import com.br.fiap.skillsfast.infrastructure.exceptions.InfraestruturaException;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.enterprise.inject.Alternative;
 import jakarta.inject.Inject;
 import javax.sql.DataSource;
 import java.sql.*;
@@ -115,8 +114,9 @@ public class JdbcUsuarioRepository implements UsuarioRepository {
         }
     }
 
+    // CORREÇÃO: Mudei de 'editar' para 'atualizar' para bater com a interface
     @Override
-    public void editar(Usuario usuario) {  // Mudei de 'atualizar' para 'editar'
+    public void atualizar(Usuario usuario) {
         String sql = """
             UPDATE USUARIO SET NOME = ?, EMAIL = ?, TELEFONE = ?, LOCALIZACAO = ?, 
             FOTO_PERFIL = ?, CURRICULO = ?, EXPERIENCIA = ?, HABILIDADES = ?, 
@@ -145,12 +145,12 @@ public class JdbcUsuarioRepository implements UsuarioRepository {
 
             int linhasAfetadas = stmt.executeUpdate();
             if (linhasAfetadas == 0) {
-                throw new InfraestruturaException("Conflito de versão ao editar usuário");
+                throw new InfraestruturaException("Conflito de versão ao atualizar usuário");
             }
 
             usuario.setVersao(usuario.getVersao() + 1);
         } catch (SQLException e) {
-            throw new InfraestruturaException("Erro ao editar usuário", e);
+            throw new InfraestruturaException("Erro ao atualizar usuário", e);
         }
     }
 

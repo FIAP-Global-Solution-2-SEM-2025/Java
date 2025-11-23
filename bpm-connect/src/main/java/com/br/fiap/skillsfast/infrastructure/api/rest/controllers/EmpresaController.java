@@ -28,14 +28,32 @@ public class EmpresaController {
     @POST
     public Response criarEmpresa(EmpresaInputDto empresaInput) {
         try {
+            System.out.println("[DEBUG] Recebendo criação de empresa: " + empresaInput.getNome());
+
+            // Adicionar debug para ver os dados recebidos
+            System.out.println("CNPJ: " + empresaInput.getCnpj());
+            System.out.println("Descrição: " + empresaInput.getDescricao());
+            System.out.println("Setor: " + empresaInput.getSetor());
+            System.out.println("Tamanho: " + empresaInput.getTamanho());
+
             Empresa empresa = EmpresaMapper.toDomain(empresaInput);
+            System.out.println("[DEBUG] Empresa mapeada: " + empresa.getNome());
+
             Empresa empresaCriada = empresaService.criarEmpresa(empresa);
+            System.out.println("[DEBUG] Empresa criada com ID: " + empresaCriada.getId());
+
             EmpresaOutputDto output = EmpresaMapper.toOutputDto(empresaCriada);
             return Response.status(Response.Status.CREATED).entity(output).build();
+
         } catch (ValidacaoDominioException e) {
+            System.err.println("[ERRO VALIDAÇÃO] " + e.getMessage());
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         } catch (Exception e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Erro interno do servidor").build();
+            System.err.println("[ERRO INTERNO] " + e.getMessage());
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Erro interno: " + e.getMessage())
+                    .build();
         }
     }
 

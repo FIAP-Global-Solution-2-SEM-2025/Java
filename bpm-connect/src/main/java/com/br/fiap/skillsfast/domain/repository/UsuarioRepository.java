@@ -9,7 +9,7 @@ public interface UsuarioRepository {
     Optional<Usuario> buscarPorId(Long id);
     Optional<Usuario> buscarPorEmail(String email);
     List<Usuario> buscarTodos();
-    void editar(Usuario usuario);
+    void atualizar(Usuario usuario);
     void desativar(Long id, Long versao);
     void reativar(Long id, Long versao);
 }

@@ -29,6 +29,11 @@ public class VagaServiceImpl implements VagaService {
     }
 
     @Override
+    public List<Vaga> buscarTodasVagas() {
+        return vagaRepository.buscarTodas();
+    }
+
+    @Override
     public List<Vaga> buscarVagasPorEmpresa(Long empresaId) throws EntidadeNaoLocalizada {
         List<Vaga> vagas = vagaRepository.buscarPorEmpresa(empresaId);
         if (vagas.isEmpty()) {
@@ -94,7 +99,7 @@ public class VagaServiceImpl implements VagaService {
     @Override
     public void adicionarRequisitoAVaga(Long vagaId, String requisito) throws EntidadeNaoLocalizada, ValidacaoDominioException {
         Vaga vaga = buscarVagaPorId(vagaId);
-        vaga.adicionarRequisito(requisito); // Usa o método da própria classe Vaga
+        vaga.adicionarRequisito(requisito);
         vagaRepository.atualizar(vaga);
     }
 
@@ -106,8 +111,29 @@ public class VagaServiceImpl implements VagaService {
     }
 
     @Override
+    public List<Vaga> buscarVagasPorNomeEmpresa(String nomeEmpresa) {
+        if (nomeEmpresa == null || nomeEmpresa.trim().isEmpty()) {
+            return buscarVagasAtivas();
+        }
+
+        return vagaRepository.buscarAtivas().stream()
+                .filter(vaga -> vaga.getEmpresaNome() != null &&
+                        vaga.getEmpresaNome().toLowerCase().contains(nomeEmpresa.toLowerCase()))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Vaga> buscarVagasPorTituloENivel(String titulo, String nivel) {
+        return List.of();
+    }
+
+    @Override
+    public List<Vaga> buscarVagasAvancado(String empresa, String titulo, String nivel) {
+        return List.of();
+    }
+
+    @Override
     public Integer contarCandidaturasPorVaga(Long vagaId) {
-        // Implementar via CandidaturaRepository depois
         return 0;
     }
 }

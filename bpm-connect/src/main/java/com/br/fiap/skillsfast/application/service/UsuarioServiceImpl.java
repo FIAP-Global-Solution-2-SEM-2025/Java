@@ -53,7 +53,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         usuarioExistente.setExperiencia(usuario.getExperiencia());
         usuarioExistente.setHabilidades(usuario.getHabilidades());
 
-        usuarioRepository.editar(usuarioExistente);  // Mudei para 'editar'
+        usuarioRepository.atualizar(usuarioExistente);
         return usuarioExistente;
     }
 
@@ -99,7 +99,8 @@ public class UsuarioServiceImpl implements UsuarioService {
         }
 
         usuario.setSenha(novaSenha);
-        usuarioRepository.editar(usuario);
+
+        usuarioRepository.atualizar(usuario);
     }
 
     private void verificarEmailExistente(String email) throws ValidacaoDominioException {
