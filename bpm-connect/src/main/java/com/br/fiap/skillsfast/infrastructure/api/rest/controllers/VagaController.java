@@ -186,29 +186,47 @@ public class VagaController {
 
     @POST
     public Response criarVaga(VagaInputDto vagaInput) {
+        System.out.println("🎯🎯🎯 [DEBUG CONTROLLER] INICIANDO criarVaga() 🎯🎯🎯");
+
         try {
-            System.out.println("=== [CONTROLLER] RECEBENDO VAGA ===");
-            System.out.println("[CONTROLLER] Titulo: " + vagaInput.getTitulo());
-            System.out.println("[CONTROLLER] EmpresaId: " + vagaInput.getEmpresaId());
-            System.out.println("[CONTROLLER] EmpresaNome: " + vagaInput.getEmpresaNome());
-            System.out.println("[CONTROLLER] Descricao: " + vagaInput.getDescricao());
+            System.out.println("=== DADOS RECEBIDOS DO FRONTEND ===");
+            System.out.println("Titulo: " + vagaInput.getTitulo());
+            System.out.println("Descricao: " + vagaInput.getDescricao());
+            System.out.println("Tipo: " + vagaInput.getTipo());
+            System.out.println("Nivel: " + vagaInput.getNivel());
+            System.out.println("Localizacao: " + vagaInput.getLocalizacao());
+            System.out.println("EmpresaId: " + vagaInput.getEmpresaId());
+            System.out.println("EmpresaNome: " + vagaInput.getEmpresaNome()); // ← VERIFIQUE SE NÃO É NULL!
+            System.out.println("Salario: " + vagaInput.getSalario());
+            System.out.println("Requisitos: " + vagaInput.getRequisitos());
 
+            System.out.println("=== CHAMANDO VagaMapper.toDomain() ===");
             Vaga vaga = VagaMapper.toDomain(vagaInput);
-            System.out.println("[CONTROLLER] Vaga mapeada: " + vaga.getTitulo());
+            System.out.println("Vaga mapeada - Titulo: " + vaga.getTitulo() + ", EmpresaNome: " + vaga.getEmpresaNome());
 
+            System.out.println("=== CHAMANDO vagaService.criarVaga() ===");
             Vaga vagaCriada = vagaService.criarVaga(vaga);
+
+            System.out.println("=== VAGA CRIADA COM SUCESSO ===");
             VagaOutputDto output = VagaMapper.toOutputDto(vagaCriada);
             return Response.status(Response.Status.CREATED).entity(output).build();
 
-        } catch (ValidacaoDominioException | EntidadeNaoLocalizada e) {
-            System.err.println("[CONTROLLER] ERRO DE VALIDAÇÃO: " + e.getMessage());
+        } catch (ValidacaoDominioException e) {
+            System.err.println("❌❌❌ ERRO DE VALIDAÇÃO: " + e.getMessage());
             e.printStackTrace();
-            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+            return Response.status(Response.Status.BAD_REQUEST).entity("Erro validação: " + e.getMessage()).build();
+
+        } catch (EntidadeNaoLocalizada e) {
+            System.err.println("❌❌❌ EMPRESA NÃO ENCONTRADA: " + e.getMessage());
+            e.printStackTrace();
+            return Response.status(Response.Status.BAD_REQUEST).entity("Empresa não encontrada: " + e.getMessage()).build();
+
         } catch (Exception e) {
-            System.err.println("[CONTROLLER] ERRO INTERNO: " + e.getMessage());
-            e.printStackTrace(); // ← ISSO VAI MOSTRAR A STACK TRACE REAL
+            System.err.println("❌❌❌ ERRO INTERNO INESPERADO: " + e.getMessage());
+            System.err.println("❌❌❌ TIPO DO ERRO: " + e.getClass().getName());
+            e.printStackTrace(); // ← ISSO É CRÍTICO!
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("Erro interno do servidor: " + e.getMessage())
+                    .entity("Erro interno: " + e.getClass().getSimpleName() + " - " + e.getMessage())
                     .build();
         }
     }
